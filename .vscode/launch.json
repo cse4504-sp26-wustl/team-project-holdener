@@ -4,12 +4,21 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+
         {
             "name": "Python Debugger: Python File",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
-            "args": "./data/players.csv"
+            "program": "${file}"
+        },
+        {
+            "name": "simulation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/simulation.py",
+            "args": ["data/players.csv", "data/pairings_round1.csv"],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
