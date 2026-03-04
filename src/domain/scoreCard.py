@@ -26,6 +26,10 @@ class ScoreCard:
         return total
     
     def add_opponent(self, player: Player, side: GameColor):
+        """
+        player - the opponent in a specific game
+        side - the color of the opponent
+        """
         self.opponents.append(player.id)
         self.sides.append(oppositeColor(side))
 

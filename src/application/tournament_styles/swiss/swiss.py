@@ -32,7 +32,7 @@ class Swiss:
         for card in cards:
             if card.get_total_score() == score:
                 group.append(card)
-            index+=1
+                index+=1
         if len(group) % 2 == 1:
             group.append(cards[index])
             index+=1
