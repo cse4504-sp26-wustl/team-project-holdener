@@ -8,4 +8,4 @@ class Py4SwissAdapter:
         my_engine = Engine()
         pairs = my_engine.generate_pairings(parsedTrf)
         print(pairs)
-        return [(pairing.white, pairing.black) for pairing in pairs]
+        return [(str(pairing.white), str(pairing.black)) for pairing in pairs]
