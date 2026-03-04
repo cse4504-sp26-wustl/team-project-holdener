@@ -50,6 +50,7 @@ class TournamentOperations:
         cards = self.build_cards()
         pairs = self.format.get_next_round(list(cards.values()))
         next_round = TournamentRound()
+        print(pairs)
         for pair in pairs:
             game = Game(self.next_game_id, self.players[pair[0]], self.players[pair[1]])
             next_round.add_game(game, self.next_game_id)
