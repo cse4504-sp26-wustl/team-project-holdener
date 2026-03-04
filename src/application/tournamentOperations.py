@@ -5,6 +5,7 @@ from domain.gameOutcome import GameOutcome
 from domain.gamePoints import GamePoints
 from domain.game import Game
 from domain.scoreCard import ScoreCard
+from domain.gameColor import GameColor
 from application.tournament_styles.swiss.swiss import Swiss
 
 class TournamentOperations:
@@ -30,8 +31,8 @@ class TournamentOperations:
                 cards[bye.id].add_score(GameOutcome.BYE)
 
             for game in round.get_games():
-                cards[game.white.id].add_opponent(game.black, 0)
-                cards[game.black.id].add_opponent(game.white, 1)
+                cards[game.white.id].add_opponent(game.black, GameColor.BLACK)
+                cards[game.black.id].add_opponent(game.white, GameColor.WHITE)
                 if game.outcome == GameOutcome.WHITE_WIN:
                     cards[game.white.id].add_score(GamePoints.WIN)
                     cards[game.black.id].add_score(GamePoints.LOSE)
