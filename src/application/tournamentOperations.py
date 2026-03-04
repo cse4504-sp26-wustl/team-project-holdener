@@ -5,7 +5,7 @@ from domain.gameOutcome import GameOutcome
 from domain.gamePoints import GamePoints
 from domain.game import Game
 from domain.scoreCard import ScoreCard
-from application.tournament_styles.swiss.swiss import Swiss
+from application.tournament_styles.py4swiss.py_4swiss_adapter import Py4SwissAdapter
 
 class TournamentOperations:
     def __init__(self, players: List[Player]):
@@ -13,7 +13,7 @@ class TournamentOperations:
         self.players = {}
         self.all_players = sorted(players, key=lambda player: player.rating, reverse=True)
         self.next_game_id = 1
-        self.format = Swiss()
+        self.format = Py4SwissAdapter()
         for p in players:
             self.players[p.id] = p
 
