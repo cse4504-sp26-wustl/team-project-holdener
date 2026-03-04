@@ -4,3 +4,5 @@ class GameOutcome(Enum):
     WHITE_WIN = 1
     BLACK_WIN = 2
     DRAW = 3
+    FORCED_BYE = 4
+    REQUESTED_BYE = 5

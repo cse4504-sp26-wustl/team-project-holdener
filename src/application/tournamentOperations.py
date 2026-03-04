@@ -30,11 +30,16 @@ class TournamentOperations:
         for round in self.all_rounds:
             # first, update score cards with byes
             for bye in round.byes:
-                cards[bye.id].add_score(GameOutcome.BYE)
+                cards[bye.id].add_score(GamePoints.BYE)
+                cards[bye.id].add_outcome(GameOutcome.FORCED_BYE)
 
             for game in round.get_games():
                 cards[game.white.id].add_opponent(game.black, GameColor.BLACK)
                 cards[game.black.id].add_opponent(game.white, GameColor.WHITE)
+
+                cards[game.white.id].add_outcome(game.outcome)
+                cards[game.black.id].add_outcome(game.outcome)
+                
                 if game.outcome == GameOutcome.WHITE_WIN:
                     cards[game.white.id].add_score(GamePoints.WIN)
                     cards[game.black.id].add_score(GamePoints.LOSE)

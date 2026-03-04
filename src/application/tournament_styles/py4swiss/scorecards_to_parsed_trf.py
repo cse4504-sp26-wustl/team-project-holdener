@@ -6,17 +6,21 @@ from py4swiss.trf.codes import PlayerCode
 from domain.scoreCard import ScoreCard
 
 from py4swiss.trf.results import ColorToken
+from py4swiss.trf.results import ResultToken
+from domain.gamePoints import GamePoints
 from domain.gameColor import GameColor
+from domain.gameOutcome import GameOutcome
 
 def scorecards_to_parsed_trf(scorecards: list[ScoreCard], tournament_name: str = "", number_of_rounds: int = 0) -> ParsedTrf:
     """Convert a list of ScoreCard objects to a ParsedTrf object."""
     
     # Create player sections from scorecards
     player_sections = []
-    for scorecard in scorecards:
+
+    for rank, scorecard in enumerate(scorecards):
         # Convert GamePoints/GameColor results to RoundResult objects
         round_results = []
-        for i, score in enumerate(scorecard.scores):
+        for i, outcome in enumerate(scorecard.outcomes):
             if i < len(scorecard.opponents):
                 opponent_id = scorecard.opponents[i]
                 color = scorecard.sides[i]
@@ -24,7 +28,7 @@ def scorecards_to_parsed_trf(scorecards: list[ScoreCard], tournament_name: str =
                 color_token = _game_color_to_color_token(color)
                 
                 # Map GamePoints to ResultToken
-                result_token = _game_points_to_result_token(score)
+                result_token = _game_outcome_to_result_token(outcome, color)
                 
                 round_result = RoundResult(
                     id=opponent_id,
@@ -42,7 +46,7 @@ def scorecards_to_parsed_trf(scorecards: list[ScoreCard], tournament_name: str =
             name=f"Player {scorecard.id}",
             fide_rating=scorecard.rating,
             points_times_ten=points_times_ten,
-            rank=0,  # Will be calculated later
+            rank=rank+1,
             results=round_results
         )
         player_sections.append(player_section)
@@ -58,7 +62,7 @@ def scorecards_to_parsed_trf(scorecards: list[ScoreCard], tournament_name: str =
         number_of_rounds=number_of_rounds,
         scoring_point_system=scoring_point_system
     )
-    
+    print(player_sections)
     # Create and return ParsedTrf
     parsed_trf = ParsedTrf(
         player_sections=player_sections,
@@ -70,19 +74,24 @@ def scorecards_to_parsed_trf(scorecards: list[ScoreCard], tournament_name: str =
     return parsed_trf
 
 
-def _game_points_to_result_token(game_points):
-    """Map GamePoints to ResultToken."""
-    from py4swiss.trf.results import ResultToken
-    from domain.gamePoints import GamePoints
+def _game_outcome_to_result_token(game_outcome: GameOutcome, game_color: GameColor):
+    """Map GameOutcome to ResultToken."""
 
-    
-    if game_points == GamePoints.BYE:
+    if game_outcome == GameOutcome.FORCED_BYE:
         return ResultToken.FULL_POINT_BYE
-    elif game_points == GamePoints.WIN:
-        return ResultToken.WIN
-    elif game_points == GamePoints.DRAW:
+    elif game_outcome == GameOutcome.WHITE_WIN:
+        if game_color == GameColor.WHITE:
+            return ResultToken.WIN
+        else:
+            return ResultToken.LOSS
+    elif game_outcome == GameOutcome.BLACK_WIN:
+        if game_color == GameColor.BLACK:
+            return ResultToken.WIN
+        else:
+            return ResultToken.LOSS
+    elif game_outcome == GameOutcome.DRAW:
         return ResultToken.DRAW
-    elif game_points == GamePoints.LOSE:
+    elif game_outcome == GamePoints.LOSE:
         return ResultToken.LOSS
     else:
         return ResultToken.LOSS  # Default fallback

@@ -1,14 +1,18 @@
 from domain.gamePoints import GamePoints
 from domain.gameColor import GameColor, oppositeColor
 from domain.player import Player
-
+from domain.gameOutcome import GameOutcome
 class ScoreCard:
     def __init__(self, player: Player):
         self.scores = []
+        self.outcomes = []
         self.id = player.id
         self.rating = player.rating
         self.opponents = []
         self.sides = []
+
+    def add_outcome(self, outcome: GameOutcome):
+        self.outcomes.append(outcome)
 
     def add_score(self, score: GamePoints):
         self.scores.append(score)
