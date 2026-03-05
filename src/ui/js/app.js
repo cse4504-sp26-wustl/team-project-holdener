@@ -131,16 +131,11 @@ function renderGames(roundIdx) {
       <td style="color:var(--muted);font-size:0.7rem">#${g.id}</td>
       <td>${wName}<br><span style="color:var(--muted);font-size:0.65rem">ID: ${g.white.id ?? '—'}</span></td>
       <td>${bName}<br><span style="color:var(--muted);font-size:0.65rem">ID: ${g.black.id ?? '—'}</span></td>
-      <td id="outcome-${g.id}">${outcomeLabel(g.outcome)}</td>
       <td>
-        <div class="result-form">
-          <select class="result-select" id="sel-${g.id}">
-            <option value="">—</option>
-            <option value="1">White Win</option>
-            <option value="2">Black Win</option>
-            <option value="3">Draw</option>
-          </select>
-          <button class="btn btn-sm" onclick="recordResult(${g.id})">Set</button>
+        <div class="result-toggle" id="result-${g.id}">
+          <button class="result-btn ${g.outcome === 'WHITE_WIN' ? 'active win' : ''}" onclick="recordResult(${g.id}, 1)" title="White Wins">W</button>
+          <button class="result-btn ${g.outcome === 'DRAW' ? 'active draw' : ''}" onclick="recordResult(${g.id}, 3)" title="Draw">D</button>
+          <button class="result-btn ${g.outcome === 'BLACK_WIN' ? 'active loss' : ''}" onclick="recordResult(${g.id}, 2)" title="Black Wins">B</button>
         </div>
       </td>
       <td>
@@ -151,13 +146,11 @@ function renderGames(roundIdx) {
 }
 
 // ── Record Result ──────────────────────────────────────
-async function recordResult(gameId) {
-  const sel = document.getElementById('sel-' + gameId);
-  const code = sel.value;
-  if (!code) { toast('Select a result first.', true); return; }
+async function recordResult(gameId, code) {
+  if (!code) { toast('Invalid result code.', true); return; }
 
   try {
-    const result = await api('record_result', gameId, parseInt(code));
+    const result = await api('record_result', gameId, code);
     if (result.error) { toast(result.error, true); return; }
 
     // Update local state
@@ -165,7 +158,7 @@ async function recordResult(gameId) {
       const g = round.find(g => g.id === gameId);
       if (g) { g.outcome = result.outcome; break; }
     }
-    document.getElementById('outcome-' + gameId).innerHTML = outcomeLabel(result.outcome);
+    renderGames(state.currentRound);
     toast(`Result recorded for game ${gameId}`);
   } catch(e) {
     toast('Error recording result: ' + e, true);

@@ -383,3 +383,45 @@ tr:hover td { background: var(--surface2); }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* ── Result Toggle ── */
+.result-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 2px;
+}
+
+.result-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.result-btn:hover {
+  background: var(--surface2);
+  color: var(--white);
+}
+
+.result-btn.active.win {
+  background: var(--win);
+  color: #a8d5b5;
+}
+
+.result-btn.active.draw {
+  background: var(--draw);
+  color: #a8bdd5;
+}
+
+.result-btn.active.loss {
+  background: var(--loss);
+  color: #d5a8a8;
+}
