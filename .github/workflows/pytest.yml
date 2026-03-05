@@ -49,7 +49,6 @@ jobs:
           --cov=. \
           --cov-report=html:coverage_html \
           -v
-      continue-on-error: true  # Upload artifacts even if tests fail
 
     - name: Upload test results
       if: always()  # Run even if previous steps fail
