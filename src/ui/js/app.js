@@ -38,6 +38,11 @@ function setStatus(text, active = false) {
   bar.className = 'status-bar' + (active ? ' active' : '');
 }
 
+function updateExportButton() {
+  const exportBtn = document.getElementById('btnExportRound');
+  exportBtn.disabled = state.rounds.length === 0 || state.currentRound < 0;
+}
+
 function outcomeLabel(outcome) {
   if (!outcome || outcome === 'None' || outcome === 'null') return '<span class="badge pending">Pending</span>';
   const map = {
@@ -100,6 +105,7 @@ async function generateRound() {
     updateStats();
     renderRoundTabs();
     renderGames(state.currentRound);
+    updateExportButton();
     document.getElementById('gamesCard').style.display = '';
     toast(`Round ${state.rounds.length} generated — ${result.games.length} games`);
   } catch(e) {
@@ -119,6 +125,7 @@ function selectRound(idx) {
   state.currentRound = idx;
   renderRoundTabs();
   renderGames(idx);
+  updateExportButton();
 }
 
 function renderGames(roundIdx) {
@@ -180,6 +187,23 @@ async function swapPlayers(gameId) {
     toast(`Swapped colors for game ${gameId}`);
   } catch(e) {
     toast('Error swapping players: ' + e, true);
+  }
+}
+
+async function exportCurrentRoundPgn() {
+  if (state.currentRound < 0 || !state.rounds.length) {
+    toast('Generate a round first.', true);
+    return;
+  }
+
+  try {
+    const result = await api('export_round_pgn', state.currentRound);
+    if (result.error) { toast(result.error, true); return; }
+    if (result.cancelled) { return; }
+
+    toast(`PGN exported for Round ${state.currentRound + 1}`);
+  } catch (e) {
+    toast('Error exporting PGN: ' + e, true);
   }
 }
 
@@ -263,11 +287,13 @@ function mockApi(fn, args) {
     return { outcome: map[args[1]] };
   }
   if (fn === 'swap_players') return { success: true };
+  if (fn === 'export_round_pgn') return { success: true, path: `round_${args[0] + 1}.pgn` };
   return { error: 'Unknown function' };
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   // Components are already in the HTML, no loading needed
+  updateExportButton();
   console.log('App initialized');
 });

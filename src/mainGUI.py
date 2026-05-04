@@ -2,8 +2,13 @@ import webview
 import os
 from domain.player import Player
 from domain.gameOutcome import GameOutcome
+from application.round_pgn_export import export_round_to_pgn
 from application.tournamentOperations import TournamentOperations
 from parser.csv_to_player import parse_file
+
+
+OPEN_DIALOG = getattr(getattr(webview, "FileDialog", None), "OPEN", webview.OPEN_DIALOG)
+SAVE_DIALOG = getattr(getattr(webview, "FileDialog", None), "SAVE", webview.SAVE_DIALOG)
 
 
 class TournamentAPI:
@@ -14,11 +19,12 @@ class TournamentAPI:
 
     def pick_file(self) -> dict:
         result = window.create_file_dialog(
-            webview.OPEN_DIALOG,
+            OPEN_DIALOG,
             file_types=('CSV Files (*.csv)',)
         )
-        if result and len(result) > 0:
-            return {"path": result[0]}
+        path = self._normalize_dialog_result(result)
+        if path:
+            return {"path": path}
         return {"path": None}
 
     def load_players(self, filename: str) -> dict:
@@ -38,6 +44,28 @@ class TournamentAPI:
             round_obj = self.tournament_ops.generate_next_round()
             games = round_obj.get_games()
             return {"games": [g.to_dict() for g in games]}
+        except Exception as e:
+            return {"error": str(e)}
+
+    def export_round_pgn(self, round_index: int) -> dict:
+        if not self.tournament_ops:
+            return {"error": "No tournament in progress."}
+
+        if round_index < 0 or round_index >= len(self.tournament_ops.all_rounds):
+            return {"error": f"Round {round_index + 1} does not exist."}
+
+        round_number = round_index + 1
+        tournament_round = self.tournament_ops.all_rounds[round_index]
+
+        try:
+            pgn_text = export_round_to_pgn(tournament_round, round_number)
+            save_path = self._pick_export_file(round_number)
+            if not save_path:
+                return {"cancelled": True}
+
+            with open(save_path, "w", encoding="utf-8") as output_file:
+                output_file.write(pgn_text)
+            return {"success": True, "path": save_path}
         except Exception as e:
             return {"error": str(e)}
 
@@ -73,6 +101,24 @@ class TournamentAPI:
             "lastName": player.lastName,
             "rating": getattr(player, "rating", None),
         }
+
+    def _pick_export_file(self, round_number: int) -> str | None:
+        suggested_name = f"round_{round_number}.pgn"
+        result = window.create_file_dialog(
+            SAVE_DIALOG,
+            save_filename=suggested_name,
+            file_types=("PGN Files (*.pgn)",),
+        )
+        return self._normalize_dialog_result(result)
+
+    def _normalize_dialog_result(self, result) -> str | None:
+        if not result:
+            return None
+        if isinstance(result, str):
+            return result
+        if isinstance(result, (list, tuple)) and len(result) > 0:
+            return result[0]
+        return None
 
 
 if __name__ == "__main__":
