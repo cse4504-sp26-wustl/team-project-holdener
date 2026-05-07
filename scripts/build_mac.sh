@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build_mac.sh – One-click build script for macOS
+# build_mac.sh - One-click build script for macOS
 #
 # Produces a self-contained "Arbiter.app" bundle inside scripts/dist/.
 # The bundle embeds Python and every required library, so it can run on

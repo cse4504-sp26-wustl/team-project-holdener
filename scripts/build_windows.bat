@@ -1,5 +1,5 @@
 @echo off
-REM build_windows.bat – One-click build script for Windows
+REM build_windows.bat - One-click build script for Windows
 REM
 REM Produces a self-contained "Arbiter.exe" inside scripts\dist\.
 REM The bundle embeds Python and every required library, so it can run on
