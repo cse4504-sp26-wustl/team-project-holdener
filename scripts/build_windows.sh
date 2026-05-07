@@ -18,6 +18,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SRC_DIR="$REPO_ROOT/src"
 REQ_FILE="$REPO_ROOT/requirements.txt"
+DATA_SEP=";"
+
+if [[ "${OS:-}" != "Windows_NT" && "${OSTYPE:-}" != msys* && "${OSTYPE:-}" != cygwin* ]]; then
+  DATA_SEP=":"
+fi
 
 echo "==> Installing/upgrading PyInstaller and project dependencies..."
 pip install --upgrade pip
@@ -34,7 +39,7 @@ pyinstaller \
   --workpath "$SCRIPT_DIR/build" \
   --specpath "$SCRIPT_DIR" \
   --paths "$SRC_DIR" \
-  --add-data "$SRC_DIR/ui;ui" \
+  --add-data "$SRC_DIR/ui${DATA_SEP}ui" \
   --hidden-import "webview" \
   --hidden-import "webview.platforms.winforms" \
   --hidden-import "webview.platforms.edgechromium" \
